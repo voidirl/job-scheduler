@@ -21,7 +21,7 @@ public class JobController {
     public List<Job> getAllJobs(){
         return jobService.getAllJobs();
     }
-    @GetMapping("/status/{status")
+    @GetMapping("/status/{status}")
     public List<Job> getJobsByStatus(@PathVariable JobStatus status){
         return jobService.getJobsByStatus(status);
     }

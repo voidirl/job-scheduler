@@ -25,7 +25,7 @@ public class Job {
     public void setId(Long id){this.id = id;}
 
     public String getJobName(){return jobName;}
-    public void setJobName(String JobName){this.jobName = jobName;}
+    public void setJobName(String jobName){this.jobName = jobName;}
 
     public JobStatus getStatus(){return status;}
     public void setStatus(JobStatus status){this.status = status;}
