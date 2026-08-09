@@ -20,7 +20,7 @@ public class JobService {
         job.setCreatedAt(LocalDateTime.now());
         return jobRepository.save(job);
     }
-    public List<Job> gelAllJobs(){
+    public List<Job> getAllJobs(){
         return jobRepository.findAll();
     }
     public List<Job> getJobsByStatus(JobStatus status){
