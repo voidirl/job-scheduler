@@ -13,10 +13,13 @@ public class JobService {
     @Autowired
     private JobRepository jobRepository;
 
-    public Job createJob(String jobName, LocalDateTime scheduledTime){
+    public Job createJob(JobRequest request){
         Job job = new Job();
-        job.setJobName(jobName);
-        job.setScheduledTime(scheduledTime);
+        job.setJobName(request.jobName());
+        job.setScheduledTime(request.scheduledTime());
+        if (request.maxRetries() != null) {
+            job.setMaxRetries(request.maxRetries());
+        }
         job.setStatus(JobStatus.SCHEDULED);
         job.setCreatedAt(LocalDateTime.now());
         return jobRepository.save(job);
@@ -30,10 +33,13 @@ public class JobService {
     public Optional<Job> getJob(Long id){
         return jobRepository.findById(id);
     }
-    public Optional<Job> updateJob(Long id, String jobName, LocalDateTime scheduledTime){
+    public Optional<Job> updateJob(Long id, JobRequest request){
         return jobRepository.findById(id).map(job -> {
-            job.setJobName(jobName);
-            job.setScheduledTime(scheduledTime);
+            job.setJobName(request.jobName());
+            job.setScheduledTime(request.scheduledTime());
+            if (request.maxRetries() != null) {
+                job.setMaxRetries(request.maxRetries());
+            }
             return jobRepository.save(job);
         });
     }

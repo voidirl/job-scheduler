@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +19,14 @@ class JobApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String jobJson(String name, String time) {
+        return "{\"jobName\":\"" + name + "\",\"scheduledTime\":\"" + time + "\"}";
+    }
+
     private long createJob() throws Exception {
         String body = mockMvc.perform(post("/api/jobs")
-                        .param("jobName", "test-job")
-                        .param("scheduledTime", "2030-01-01T10:00:00"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jobJson("test-job", "2030-01-01T10:00:00")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return Long.parseLong(com.jayway.jsonpath.JsonPath.read(body, "$.id").toString());
@@ -46,8 +51,8 @@ class JobApiIntegrationTest {
     void updateJobChangesFields() throws Exception {
         long id = createJob();
         mockMvc.perform(put("/api/jobs/" + id)
-                        .param("jobName", "renamed-job")
-                        .param("scheduledTime", "2031-06-15T08:30:00"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jobJson("renamed-job", "2031-06-15T08:30:00")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.jobName").value("renamed-job"))
                 .andExpect(jsonPath("$.scheduledTime").value("2031-06-15T08:30:00"));
@@ -56,8 +61,8 @@ class JobApiIntegrationTest {
     @Test
     void updateMissingJobReturns404() throws Exception {
         mockMvc.perform(put("/api/jobs/999999")
-                        .param("jobName", "x")
-                        .param("scheduledTime", "2030-01-01T10:00:00"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jobJson("x", "2030-01-01T10:00:00")))
                 .andExpect(status().isNotFound());
     }
 
@@ -68,5 +73,29 @@ class JobApiIntegrationTest {
                 .andExpect(status().isNoContent());
         mockMvc.perform(get("/api/jobs/" + id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createWithBlankNameReturns400() throws Exception {
+        mockMvc.perform(post("/api/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jobJson("", "2030-01-01T10:00:00")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createWithPastTimeReturns400() throws Exception {
+        mockMvc.perform(post("/api/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jobJson("test-job", "2020-01-01T10:00:00")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createWithMalformedTimeReturns400() throws Exception {
+        mockMvc.perform(post("/api/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"jobName\":\"test-job\",\"scheduledTime\":\"not-a-date\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -1,9 +1,9 @@
 package com.voidirl.jobscheduler;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,8 @@ public class JobController {
     private JobService jobService;
 
     @PostMapping
-    public Job createJob(@RequestParam String jobName, @RequestParam String scheduledTime){
-        return jobService.createJob(jobName, LocalDateTime.parse(scheduledTime));
+    public Job createJob(@Valid @RequestBody JobRequest request){
+        return jobService.createJob(request);
     }
     @GetMapping
     public List<Job> getAllJobs(){
@@ -34,8 +34,8 @@ public class JobController {
                 .orElse(ResponseEntity.notFound().build());
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Job> updateJob(@PathVariable Long id, @RequestParam String jobName, @RequestParam String scheduledTime){
-        return jobService.updateJob(id, jobName, LocalDateTime.parse(scheduledTime))
+    public ResponseEntity<Job> updateJob(@PathVariable Long id, @Valid @RequestBody JobRequest request){
+        return jobService.updateJob(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
