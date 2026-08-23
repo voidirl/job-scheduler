@@ -15,6 +15,8 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private JobStatus status;
     private LocalDateTime scheduledTime;
+    private String callbackUrl;
+    private LocalDateTime nextAttemptTime;
 
     private int retryCount = 0;
     private int maxRetries = 3;
@@ -32,6 +34,12 @@ public class Job {
 
     public LocalDateTime getScheduledTime(){return scheduledTime;}
     public void setScheduledTime(LocalDateTime scheduledTime){this.scheduledTime = scheduledTime;}
+
+    public String getCallbackUrl(){return callbackUrl;}
+    public void setCallbackUrl(String callbackUrl){this.callbackUrl = callbackUrl;}
+
+    public LocalDateTime getNextAttemptTime(){return nextAttemptTime;}
+    public void setNextAttemptTime(LocalDateTime nextAttemptTime){this.nextAttemptTime = nextAttemptTime;}
 
     public int getRetryCount(){return retryCount;}
     public void setRetryCount(int retryCount){this.retryCount = retryCount;}

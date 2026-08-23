@@ -98,4 +98,12 @@ class JobApiIntegrationTest {
                         .content("{\"jobName\":\"test-job\",\"scheduledTime\":\"not-a-date\"}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void createWithInvalidCallbackUrlReturns400() throws Exception {
+        mockMvc.perform(post("/api/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"jobName\":\"test-job\",\"scheduledTime\":\"2030-01-01T10:00:00\",\"callbackUrl\":\"not-a-url\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }

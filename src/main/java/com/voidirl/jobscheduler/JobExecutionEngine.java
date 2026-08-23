@@ -13,6 +13,9 @@ public class JobExecutionEngine {
 
     private static final Logger log = LoggerFactory.getLogger(JobExecutionEngine.class);
 
+    private static final long BACKOFF_BASE_SECONDS = 5;
+    private static final long BACKOFF_MAX_SECONDS = 300;
+
     private final JobRepository jobRepository;
     private final JobTask jobTask;
 
@@ -23,8 +26,7 @@ public class JobExecutionEngine {
 
     @Scheduled(fixedDelay = 2000)
     public void runDueJobs() {
-        List<Job> dueJobs = jobRepository.findByStatusAndScheduledTimeLessThanEqualOrderByScheduledTimeAsc(
-                JobStatus.SCHEDULED, LocalDateTime.now());
+        List<Job> dueJobs = jobRepository.findDueJobs(JobStatus.SCHEDULED, LocalDateTime.now());
         for (Job job : dueJobs) {
             execute(job);
         }
@@ -44,9 +46,17 @@ public class JobExecutionEngine {
             int attempts = job.getRetryCount() + 1;
             job.setRetryCount(attempts);
             boolean retriesLeft = attempts <= job.getMaxRetries();
-            job.setStatus(retriesLeft ? JobStatus.SCHEDULED : JobStatus.FAILED);
-            log.warn("Job {} attempt {} failed: {} ({})", job.getId(), attempts, e.getMessage(),
-                    retriesLeft ? "will retry" : "retries exhausted");
+            if (retriesLeft) {
+                long delaySeconds = Math.min(
+                        BACKOFF_BASE_SECONDS << Math.min(attempts - 1, 6),
+                        BACKOFF_MAX_SECONDS);
+                job.setNextAttemptTime(LocalDateTime.now().plusSeconds(delaySeconds));
+                job.setStatus(JobStatus.SCHEDULED);
+                log.warn("Job {} attempt {} failed: {} (retry in {}s)", job.getId(), attempts, e.getMessage(), delaySeconds);
+            } else {
+                job.setStatus(JobStatus.FAILED);
+                log.warn("Job {} attempt {} failed: {} (retries exhausted)", job.getId(), attempts, e.getMessage());
+            }
         }
         jobRepository.save(job);
     }
