@@ -1,6 +1,10 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.repository;
 
+import com.voidirl.jobscheduler.model.Job;
+import com.voidirl.jobscheduler.model.JobStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,5 +22,6 @@ public interface JobRepository extends JpaRepository<Job, Long> {
               and (j.nextAttemptTime is null or j.nextAttemptTime <= :now)
             order by j.scheduledTime asc
             """)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Job> findDueJobs(@Param("status") JobStatus status, @Param("now") LocalDateTime now);
 }

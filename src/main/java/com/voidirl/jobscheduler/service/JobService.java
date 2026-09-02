@@ -1,5 +1,9 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.service;
 
+import com.voidirl.jobscheduler.dto.JobRequest;
+import com.voidirl.jobscheduler.model.Job;
+import com.voidirl.jobscheduler.model.JobStatus;
+import com.voidirl.jobscheduler.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

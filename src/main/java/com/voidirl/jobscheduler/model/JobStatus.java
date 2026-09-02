@@ -1,9 +1,10 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.model;
 
 public enum JobStatus {
     SCHEDULED,
     TRIGGERED,
     RUNNING,
     COMPLETED,
-    FAILED
+    FAILED,
+    DEAD_LETTERED
 }

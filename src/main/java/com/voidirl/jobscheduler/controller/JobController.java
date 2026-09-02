@@ -1,5 +1,9 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.controller;
 
+import com.voidirl.jobscheduler.dto.JobRequest;
+import com.voidirl.jobscheduler.model.Job;
+import com.voidirl.jobscheduler.model.JobStatus;
+import com.voidirl.jobscheduler.service.JobService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +30,10 @@ public class JobController {
     @GetMapping("/status/{status}")
     public List<Job> getJobsByStatus(@PathVariable JobStatus status){
         return jobService.getJobsByStatus(status);
+    }
+    @GetMapping("/dead-letter")
+    public List<Job> getDeadLetteredJobs(){
+        return jobService.getJobsByStatus(JobStatus.DEAD_LETTERED);
     }
     @GetMapping("/{id}")
     public ResponseEntity<Job> getJob(@PathVariable Long id){

@@ -1,4 +1,4 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.dto;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;

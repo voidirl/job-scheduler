@@ -1,5 +1,6 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.executor;
 
+import com.voidirl.jobscheduler.model.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

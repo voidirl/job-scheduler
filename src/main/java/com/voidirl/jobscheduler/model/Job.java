@@ -1,4 +1,4 @@
-package com.voidirl.jobscheduler;
+package com.voidirl.jobscheduler.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
